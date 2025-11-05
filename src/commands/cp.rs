@@ -21,7 +21,9 @@ use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
 use opendal::ErrorKind;
 use opendal::Metadata;
+use std::path::Component;
 use std::path::Path;
+use std::path::PathBuf;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -154,20 +156,21 @@ impl CopyCmd {
         let dst_root = Path::new(&final_dst_path);
         let mut ds = src_op.lister_with(&src_path).recursive(true).await?;
 
+        let normalized_src_root = normalize_path_for_prefix(Path::new(&src_path));
+
         while let Some(de) = ds.try_next().await? {
             let meta = de.metadata();
             let depath = de.path();
 
-            // Calculate relative path using Path::strip_prefix
-            let src_root_path = Path::new(&src_path);
-            let entry_path = Path::new(depath);
-            let relative_path = entry_path.strip_prefix(src_root_path).with_context(|| {
-                format!(
-                    "Internal error: Lister path '{depath}' does not start with source path '{src_path}'"
-                )
-            })?; // relative_path is a &Path
+            // Calculate relative path, ignoring differences in root components such as leading slashes.
+            let relative_path = relative_path_from_entry(
+                &normalized_src_root,
+                Path::new(depath),
+                &src_path,
+                depath,
+            )?;
 
-            let current_dst_path_path = dst_root.join(relative_path);
+            let current_dst_path_path = dst_root.join(&relative_path);
             let current_dst_path = current_dst_path_path.to_string_lossy().to_string();
 
             if meta.mode().is_dir() {
@@ -254,5 +257,70 @@ impl CopyProgress {
         self.progress_bar.finish_and_clear();
         println!("Finish {}", self.path);
         Ok(written)
+    }
+}
+
+fn normalize_path_for_prefix(path: &Path) -> PathBuf {
+    let mut normalized = PathBuf::new();
+    for component in path.components() {
+        match component {
+            Component::RootDir | Component::CurDir => continue,
+            Component::Normal(os) => normalized.push(Path::new(os)),
+            Component::ParentDir => normalized.push(".."),
+            Component::Prefix(prefix) => normalized.push(Path::new(prefix.as_os_str())),
+        }
+    }
+    normalized
+}
+
+fn relative_path_from_entry(
+    normalized_src_root: &Path,
+    entry: &Path,
+    original_src: &str,
+    original_entry: &str,
+) -> Result<PathBuf> {
+    let normalized_entry = normalize_path_for_prefix(entry);
+    if normalized_src_root.as_os_str().is_empty() {
+        return Ok(normalized_entry);
+    }
+
+    normalized_entry
+        .strip_prefix(normalized_src_root)
+        .map(Path::to_path_buf)
+        .with_context(|| {
+            format!(
+                "Internal error: Lister path '{original_entry}' does not start with source path '{original_src}'"
+            )
+        })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn normalize_path_strips_root_and_current_components() {
+        let normalized = normalize_path_for_prefix(Path::new("/backup/./subdir/"));
+        assert_eq!(normalized, PathBuf::from("backup/subdir"));
+    }
+
+    #[test]
+    fn relative_path_ignores_leading_slash_difference() {
+        let src = "/backup/subdir/";
+        let entry = "backup/subdir/data/dir/file.parquet";
+        let normalized_src = normalize_path_for_prefix(Path::new(src));
+        let relative =
+            relative_path_from_entry(&normalized_src, Path::new(entry), src, entry).unwrap();
+        assert_eq!(relative, PathBuf::from("data/dir/file.parquet"));
+    }
+
+    #[test]
+    fn relative_path_returns_error_for_unmatched_prefix() {
+        let src = "/backup/subdir/";
+        let entry = "backup/other/file.parquet";
+        let normalized_src = normalize_path_for_prefix(Path::new(src));
+        let err = relative_path_from_entry(&normalized_src, Path::new(entry), src, entry)
+            .expect_err("expected prefix mismatch");
+        assert!(format!("{err}").contains("does not start with source path"));
     }
 }
