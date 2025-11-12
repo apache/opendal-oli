@@ -124,9 +124,6 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - name: Remove artifact manifest
-        run: rm -f dist/artifact-manifest.json
-
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
