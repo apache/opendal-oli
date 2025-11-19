@@ -18,8 +18,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Question
-    url: https://github.com/apache/opendal/discussions/new?category=q-a
-    about: Ask questions about opendal usage and development.
+    url: https://github.com/apache/opendal-oli/discussions/new?category=q-a
+    about: Ask questions about Apache OpenDAL Oli (opendal-oli) usage and development.
   - name: Discord
     url: https://opendal.apache.org/discord
-    about: Join discord for real-time discussions.
+    about: Join the Apache OpenDAL Discord for real-time discussions about opendal-oli.

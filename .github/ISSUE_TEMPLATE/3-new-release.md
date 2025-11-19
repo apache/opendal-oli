@@ -1,10 +1,10 @@
 ---
 name: New Release
 about: Use this template for start making a new release
-title: "Tracking issues of OpenDAL ${opendal_version} Release"
+title: "Tracking issues of Apache OpenDAL Oli (opendal-oli) ${opendal_oli_version} Release"
 ---
 
-This issue is used to track tasks of the opendal ${opendal_version} release.
+This issue is used to track tasks of the Apache OpenDAL Oli (opendal-oli) ${opendal_oli_version} release.
 
 ## Tasks
 
@@ -29,7 +29,7 @@ This issue is used to track tasks of the opendal ${opendal_version} release.
 
 ### Voting
 
-- [ ] Start VOTE at opendal community
+- [ ] Start VOTE at the Apache OpenDAL community
 
 ### Official Release
 
