@@ -62,6 +62,9 @@ pub struct CopyCmd {
     /// Copy objects recursively.
     #[arg(short = 'r', long)]
     pub recursive: bool,
+    /// Explicit content type for destination objects.
+    #[arg(long = "content-type")]
+    pub content_type: Option<String>,
 }
 
 impl CopyCmd {
@@ -70,14 +73,22 @@ impl CopyCmd {
     }
 
     async fn do_run(self) -> Result<()> {
-        let cfg = Config::load(&self.config_params.config)?;
+        let CopyCmd {
+            config_params,
+            source,
+            destination,
+            recursive,
+            content_type,
+        } = self;
 
-        let (src_op, src_path) = cfg.parse_location(&self.source)?;
-        let (dst_op, dst_path) = cfg.parse_location(&self.destination)?;
+        let cfg = Config::load(&config_params.config)?;
+
+        let (src_op, src_path) = cfg.parse_location(&source)?;
+        let (dst_op, dst_path) = cfg.parse_location(&destination)?;
 
         let final_dst_path = match dst_op.stat(&dst_path).await {
             Ok(dst_meta) if dst_meta.mode().is_dir() => {
-                if self.recursive {
+                if recursive {
                     dst_path.clone()
                 } else if let Some(filename) = Path::new(&src_path).file_name() {
                     Path::new(&dst_path)
@@ -95,7 +106,7 @@ impl CopyCmd {
             Ok(_) => {
                 // Destination exists but is a file. Overwrite it (non-recursive)
                 // or error (recursive, handled below).
-                if self.recursive {
+                if recursive {
                     bail!(
                         "Recursive copy destination '{}' exists but is not a directory.",
                         dst_path
@@ -109,12 +120,13 @@ impl CopyCmd {
             }
         };
 
-        if !self.recursive {
+        if !recursive {
             // Non-recursive copy: Use the final_dst_path directly.
-            let mut dst_w = dst_op
-                .writer(&final_dst_path)
-                .await?
-                .into_futures_async_write();
+            let mut dst_builder = dst_op.writer_with(&final_dst_path);
+            if let Some(ref ct) = content_type {
+                dst_builder = dst_builder.content_type(ct);
+            }
+            let mut dst_w = dst_builder.await?.into_futures_async_write();
             let src_meta = src_op.stat(&src_path).await?;
             let reader = src_op.reader_with(&src_path).chunk(8 * 1024 * 1024).await?;
             let buf_reader = reader
@@ -204,10 +216,11 @@ impl CopyCmd {
                 .await?;
 
             let copy_progress = CopyProgress::new(&fresh_meta, depath.to_string());
-            let mut writer = dst_op
-                .writer(&current_dst_path)
-                .await?
-                .into_futures_async_write();
+            let mut writer_builder = dst_op.writer_with(&current_dst_path);
+            if let Some(ref ct) = content_type {
+                writer_builder = writer_builder.content_type(ct);
+            }
+            let mut writer = writer_builder.await?.into_futures_async_write();
 
             copy_progress.copy(buf_reader, &mut writer).await?;
             writer.close().await?;
@@ -297,6 +310,7 @@ fn relative_path_from_entry(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use clap::Parser;
 
     #[test]
     fn normalize_path_strips_root_and_current_components() {
@@ -322,5 +336,17 @@ mod tests {
         let err = relative_path_from_entry(&normalized_src, Path::new(entry), src, entry)
             .expect_err("expected prefix mismatch");
         assert!(format!("{err}").contains("does not start with source path"));
+    }
+
+    #[test]
+    fn parses_content_type_flag() {
+        let cmd = CopyCmd::parse_from([
+            "cp",
+            "--content-type",
+            "text/plain",
+            "src_profile:/foo",
+            "dst_profile:/bar",
+        ]);
+        assert_eq!(cmd.content_type.as_deref(), Some("text/plain"));
     }
 }
