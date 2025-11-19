@@ -17,11 +17,6 @@ This issue is used to track tasks of the opendal ${opendal_version} release.
 #### GitHub Side
 
 - [ ] Bump version in project
-  - [ ] rust
-  - [ ] cpp
-  - [ ] haskell
-  - [ ] java
-  - [ ] nodejs
 - [ ] Update docs
 - [ ] Generate dependencies list
 - [ ] Push release candidate tag to GitHub
