@@ -34,6 +34,7 @@ async fn test_basic_stat() -> Result<()> {
     path: [TEMP_DIR]/dst.txt
     size: 5
     type: file
+    content-type: text/plain
     last-modified: [TIMESTAMP]
 
     ----- stderr -----
@@ -56,6 +57,7 @@ async fn test_stat_for_path_in_current_dir() -> Result<()> {
     path: dst.txt
     size: 5
     type: file
+    content-type: text/plain
     last-modified: [TIMESTAMP]
 
     ----- stderr -----

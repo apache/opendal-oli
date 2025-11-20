@@ -28,6 +28,7 @@ use anyhow::Result;
 use anyhow::anyhow;
 use opendal::Operator;
 use opendal::Scheme;
+use opendal::layers::MimeGuessLayer;
 use opendal::services;
 use serde::Deserialize;
 use url::Url;
@@ -142,7 +143,12 @@ impl Config {
                 }
             };
 
-            return Ok((Operator::new(fs_builder)?.finish(), filename.into()));
+            return Ok((
+                Operator::new(fs_builder)?
+                    .layer(MimeGuessLayer::default())
+                    .finish(),
+                filename.into(),
+            ));
         }
 
         let location = Url::parse(s)?;
@@ -166,12 +172,15 @@ impl Config {
             .get("type")
             .ok_or_else(|| anyhow!("missing 'type' in profile"))?;
         let scheme = Scheme::from_str(svc)?;
-        Ok(Operator::via_iter(scheme, profile.clone())?)
+        let op = Operator::via_iter(scheme, profile.clone())?.layer(MimeGuessLayer::default());
+        Ok(op)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use opendal::Scheme;
 
     use super::*;
@@ -205,6 +214,23 @@ mod tests {
                 env::remove_var(k);
             }
         }
+    }
+
+    #[tokio::test]
+    async fn operator_uses_mime_guess_layer() -> Result<()> {
+        let mut memory_profile = HashMap::new();
+        memory_profile.insert("type".to_string(), "memory".to_string());
+
+        let mut profiles = HashMap::new();
+        profiles.insert("mem".to_string(), memory_profile);
+
+        let cfg = Config { profiles };
+        let op = cfg.operator("mem")?;
+        op.write("demo.json", "{}").await?;
+
+        let meta = op.stat("demo.json").await?;
+        assert_eq!(meta.content_type(), Some("application/json"));
+        Ok(())
     }
 
     #[test]

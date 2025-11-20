@@ -78,6 +78,9 @@ oli cp ./update-ecs-loadbalancer.json s3:/update-ecs-loadbalancer.json
 oli ls s3:/
 # fleet.png
 # update-ecs-loadbalancer.json
+
+# Override the inferred MIME type when needed:
+oli cp --content-type application/json ./update-ecs-loadbalancer.json s3:/update-ecs-loadbalancer.json
 ```
 
 ### Example: use `oli` copy file from S3 to R2
