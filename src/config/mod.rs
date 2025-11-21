@@ -163,6 +163,14 @@ impl Config {
         Ok((op, path))
     }
 
+    pub fn profile_names(&self) -> Vec<String> {
+        self.profiles.keys().cloned().collect()
+    }
+
+    pub fn profile(&self, name: &str) -> Option<&HashMap<String, String>> {
+        self.profiles.get(name)
+    }
+
     pub fn operator(&self, profile_name: &str) -> Result<Operator> {
         let profile = self
             .profiles
