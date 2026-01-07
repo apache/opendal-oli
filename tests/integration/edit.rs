@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-use std::env;
 use std::fs;
 
 use crate::test_utils::*;

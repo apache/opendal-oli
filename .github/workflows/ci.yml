@@ -24,9 +24,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "src/**"
-      - ".github/workflows/ci.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
