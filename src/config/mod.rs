@@ -323,7 +323,7 @@ enable_virtual_host_style = "on"
         for case in test_cases {
             let (op, path) = cfg.parse_location(case.input).unwrap();
             let info = op.info();
-            assert_eq!(Scheme::Fs, info.scheme());
+            assert_eq!(Scheme::Fs.into_static(), info.scheme());
             assert_eq!("/", info.root());
             assert!(!path.starts_with('.'));
             assert!(path.ends_with(case.suffix));
@@ -345,7 +345,7 @@ enable_virtual_host_style = "on"
         let (op, path) = cfg.parse_location("mys3:///foo/1.txt").unwrap();
         assert_eq!("/foo/1.txt", path);
         let info = op.info();
-        assert_eq!(Scheme::S3, info.scheme());
+        assert_eq!(Scheme::S3.into_static(), info.scheme());
         assert_eq!("mybucket", info.name());
     }
 
@@ -364,7 +364,7 @@ enable_virtual_host_style = "on"
         let (op, path) = cfg.parse_location("mys3:/foo/1.txt").unwrap();
         assert_eq!("/foo/1.txt", path);
         let info = op.info();
-        assert_eq!(Scheme::S3, info.scheme());
+        assert_eq!(Scheme::S3.into_static(), info.scheme());
         assert_eq!("mybucket", info.name());
     }
 
