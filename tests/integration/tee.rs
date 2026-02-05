@@ -17,6 +17,7 @@
 
 use crate::test_utils::*;
 use anyhow::Result;
+use assert_cmd::cargo_bin;
 use std::fs;
 use std::io::Write;
 use tempfile::TempDir;
@@ -97,7 +98,7 @@ fn test_tee_non_existing_file() -> Result<()> {
     let dst_path = temp_dir.path().join("non_existing_file.txt");
     let dst_path_str = dst_path.as_os_str().to_str().unwrap();
 
-    let mut cmd: assert_cmd::Command = std::process::Command::cargo_bin("oli")?.into();
+    let mut cmd: assert_cmd::Command = std::process::Command::new(cargo_bin!("oli")).into();
     cmd.args(["tee", dst_path_str]);
     cmd.write_stdin("Hello, world!");
     cmd.assert().success();
@@ -117,7 +118,7 @@ fn test_tee_append_succeed() -> Result<()> {
     // Initial content
     fs::write(&dst_path, "Hello, ")?;
 
-    let mut cmd: assert_cmd::Command = std::process::Command::cargo_bin("oli")?.into();
+    let mut cmd: assert_cmd::Command = std::process::Command::new(cargo_bin!("oli")).into();
     cmd.args(["tee", "-a", dst_path_str]);
     cmd.write_stdin("world!");
     cmd.assert().success();
@@ -134,7 +135,7 @@ fn test_tee_append_file_not_found() -> Result<()> {
     let file_path = temp_dir.path().join("test_append_not_found.txt");
     let file_path_str = file_path.to_str().unwrap();
 
-    let mut cmd: assert_cmd::Command = std::process::Command::cargo_bin("oli")?.into();
+    let mut cmd: assert_cmd::Command = std::process::Command::new(cargo_bin!("oli")).into();
     cmd.arg("tee")
         .arg("-a")
         .arg(file_path_str)
@@ -157,7 +158,7 @@ fn test_tee_overwrite_existing_file() -> Result<()> {
     // Create an existing file with some content
     fs::write(&file_path, "initial data")?;
 
-    let mut cmd: assert_cmd::Command = std::process::Command::cargo_bin("oli")?.into();
+    let mut cmd: assert_cmd::Command = std::process::Command::new(cargo_bin!("oli")).into();
     cmd.arg("tee").arg(file_path_str).write_stdin("new data");
     cmd.assert().success();
 
