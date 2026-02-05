@@ -64,7 +64,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build target
-        uses: ClementTsang/cargo-action@v0.0.6
+        uses: ClementTsang/cargo-action@v0.0.7
         with:
           use-cross: ${{ !!matrix.use-cross }}
           command: build
