@@ -98,6 +98,16 @@ Cause:
 Fix:
 - Create config file with at least one profile.
 
+### `TOML parse error ... missing field profiles`
+
+Cause:
+- `--config` points to an invalid or empty TOML file.
+- In environment-variable mode, `--config` was passed unintentionally.
+
+Fix:
+- In config-file mode, pass a valid config file containing `[profiles.*]`.
+- In environment-variable mode, do not pass `--config`.
+
 ## Operational Patterns
 
 ### Cross-Profile Transfer

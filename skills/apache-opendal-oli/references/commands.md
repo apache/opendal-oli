@@ -19,31 +19,11 @@ oli ls 's3:/data/'
 oli ls 's3://data/'
 ```
 
-## Config Resolution
+## Profile Setup
 
-- Default config path:
-  - Linux: `~/.config/oli/config.toml`
-  - macOS: `~/Library/Application Support/oli/config.toml`
-  - Windows: `%APPDATA%\oli\config.toml`
-- Environment variables override file configuration.
-- Environment key format: `OLI_PROFILE_<PROFILE>_<OPTION>`
+For profile source modes, config examples, and `--config` usage rules, read:
 
-Examples:
-
-```bash
-OLI_PROFILE_S3_TYPE=s3
-OLI_PROFILE_S3_BUCKET=my-bucket
-OLI_PROFILE_S3_REGION=us-east-1
-```
-
-## Config Option Placement
-
-`--config <path>` is a subcommand option (not a top-level global option).
-
-```bash
-oli ls --config ./config.toml 's3:/'
-oli cp --config ./config.toml './a.txt' 's3:/a.txt'
-```
+- `references/profile-setup.md`
 
 ## Commands
 

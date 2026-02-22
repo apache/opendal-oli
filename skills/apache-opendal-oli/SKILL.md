@@ -9,7 +9,7 @@ description: Direct command playbooks for Apache OpenDAL Oli CLI data access and
 
 - Prefer direct command execution over abstract planning.
 - Run read-only checks before mutating data.
-- Use explicit paths and explicit `--config` when environment consistency matters.
+- Use explicit paths and explicit profile source selection (config-file mode or environment mode).
 
 ## Direct Command Playbooks
 
@@ -91,7 +91,8 @@ oli bench --config ./config.toml s3 ./suite.toml
 - For directory-level mutations, explicitly use `-r` and inspect scope first.
 - For delete operations, list first, delete second, verify third.
 - For cross-profile copy and move, verify source and destination with `stat` or `ls`.
-- When non-default config is required, always pass `--config <path>` explicitly.
+- In config-file mode, pass `--config <path>` explicitly.
+- In environment-variable mode, do not pass `--config`.
 
 ## Failure Triage
 
@@ -102,5 +103,6 @@ oli bench --config ./config.toml s3 ./suite.toml
 
 ## Resource Navigation
 
+- Read `references/profile-setup.md` for config-file mode vs environment-variable mode.
 - Read `references/commands.md` for command semantics and flags.
 - Read `references/safety-troubleshooting.md` for risk control and debugging.
