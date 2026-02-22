@@ -36,12 +36,12 @@ OLI_PROFILE_S3_BUCKET=my-bucket
 OLI_PROFILE_S3_REGION=us-east-1
 ```
 
-## Global Parameter
+## Config Option Placement
 
-`--config <path>` is available through `ConfigParams` in command implementations.
+`--config <path>` is a subcommand option (not a top-level global option).
 
 ```bash
-oli --config ./config.toml ls 's3:/'
+oli ls --config ./config.toml 's3:/'
 oli cp --config ./config.toml './a.txt' 's3:/a.txt'
 ```
 
