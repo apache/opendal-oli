@@ -4,7 +4,7 @@
 
 - Use local filesystem mode when the argument does not contain `:/`.
 - Use remote profile mode when the argument is `<profile>:/<path>`.
-- Avoid `://` in location strings. `oli` treats host parts as invalid.
+- OLI locations use `profile:/path` syntax, not URL syntax.
 
 Examples:
 
@@ -15,7 +15,7 @@ oli ls './data/'
 # remote path
 oli ls 's3:/data/'
 
-# invalid syntax (do not use)
+# URL-style syntax (not interpreted as profile location)
 oli ls 's3://data/'
 ```
 

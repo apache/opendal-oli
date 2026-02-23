@@ -1,4 +1,4 @@
 interface:
   display_name: "Apache OpenDAL Oli"
   short_description: "Direct command playbooks for Apache OpenDAL Oli CLI"
-  default_prompt: "Use $apache-opendal-oli to execute real Apache OpenDAL Oli CLI commands for data access and mutation."
+  default_prompt: "Use $oli to execute real Apache OpenDAL Oli CLI commands for data access and mutation."

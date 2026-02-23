@@ -1,5 +1,5 @@
 ---
-name: apache-opendal-oli
+name: oli
 description: Direct command playbooks for Apache OpenDAL Oli CLI data access and mutation. Use when Codex must run real `oli` commands to list, read, copy, move, delete, edit, stream, or benchmark data across local paths and `profile:/path` locations.
 ---
 
