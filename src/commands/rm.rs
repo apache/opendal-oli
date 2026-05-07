@@ -51,7 +51,7 @@ impl RmCmd {
         }
 
         println!("Delete all: {path}");
-        op.remove_all(&path).await?;
+        op.delete_with(&path).recursive(true).await?;
         Ok(())
     }
 }
