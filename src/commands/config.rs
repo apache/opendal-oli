@@ -103,7 +103,7 @@ impl ConfigAddCmd {
         }
 
         let mut profile = HashMap::from([("type".to_string(), schema.name.to_string())]);
-        for field in schema.fields {
+        for field in ordered_prompt_fields(schema) {
             let Some(value) = prompt_field(field)? else {
                 return Ok(());
             };
@@ -437,6 +437,15 @@ fn profile_schema(name: &str) -> Option<&'static ProfileSchema> {
     SCHEMAS.iter().find(|schema| schema.name == name)
 }
 
+fn ordered_prompt_fields(schema: &ProfileSchema) -> Vec<&ProfileField> {
+    schema
+        .fields
+        .iter()
+        .filter(|field| field.required)
+        .chain(schema.fields.iter().filter(|field| !field.required))
+        .collect()
+}
+
 fn prompt_required_text(message: &str) -> Result<Option<String>> {
     loop {
         match Text::new(message).prompt() {
@@ -597,6 +606,30 @@ mod tests {
         assert!(is_secret_like("password"));
         assert!(is_secret_like("credential_path"));
         assert!(!is_secret_like("endpoint"));
+    }
+
+    #[test]
+    fn required_fields_are_prompted_first() {
+        let schema = profile_schema("s3").expect("s3 schema should be present");
+        let fields = ordered_prompt_fields(schema)
+            .into_iter()
+            .map(|field| field.name)
+            .collect::<Vec<_>>();
+
+        assert_eq!(fields[0], "bucket");
+        assert_eq!(fields[1], "root");
+        assert!(
+            fields
+                .iter()
+                .skip_while(|name| schema
+                    .fields
+                    .iter()
+                    .any(|field| field.name == **name && field.required))
+                .all(|name| schema
+                    .fields
+                    .iter()
+                    .any(|field| field.name == *name && !field.required))
+        );
     }
 
     #[test]
