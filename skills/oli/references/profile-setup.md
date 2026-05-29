@@ -20,6 +20,16 @@ Use one profile source mode per shell/session:
 
 Use `--config` as a subcommand option (not a top-level global option).
 
+To create or update a profile interactively, use `oli config add`. It prompts
+for a storage schema, a profile name, and the fields for the selected schema.
+Secret-like fields such as passwords, access tokens, and secret keys are masked
+while typed.
+
+```bash
+oli config add
+oli config add --config ./config.toml
+```
+
 Example `config.toml` with `s3` and `r2`:
 
 ```toml

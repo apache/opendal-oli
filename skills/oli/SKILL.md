@@ -84,6 +84,14 @@ EDITOR=vim oli edit 's3:/docs/README.md'
 oli bench --config ./config.toml s3 ./suite.toml
 ```
 
+### Add Or Inspect Profiles
+
+```bash
+oli config add
+oli config add --config ./config.toml
+oli config view
+```
+
 ## Hard Rules
 
 - Always use `profile:/path` syntax and avoid `://`.
@@ -96,8 +104,8 @@ oli bench --config ./config.toml s3 ./suite.toml
 
 ## Failure Triage
 
-- `unknown profile`: check profile name and `config.toml`.
-- `missing 'type' in profile`: add profile `type`.
+- `unknown profile`: check profile name and `config.toml`; use `oli config add` for file-backed profiles.
+- `missing 'type' in profile`: recreate/update the profile with `oli config add`, or add profile `type`.
 - `Host part in a location is not supported`: replace `://` with `:/`.
 - Recursive command errors: confirm `-r` and target kind (file vs directory).
 

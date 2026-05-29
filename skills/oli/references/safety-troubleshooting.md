@@ -55,7 +55,8 @@ Cause:
 - Profile name missing in config and environment.
 
 Fix:
-- Add `[profiles.<name>]` in `config.toml`, or set `OLI_PROFILE_<NAME>_TYPE`.
+- Run `oli config add`, add `[profiles.<name>]` in `config.toml`, or set
+  `OLI_PROFILE_<NAME>_TYPE`.
 - Use `oli config view` to inspect available profiles.
 
 ### `missing 'type' in profile`
@@ -64,7 +65,8 @@ Cause:
 - Profile exists but has no `type` key.
 
 Fix:
-- Add `type = "<service>"` in the profile table.
+- Recreate/update the profile with `oli config add`, or add
+  `type = "<service>"` in the profile table.
 
 ### `Host part in a location is not supported`
 
@@ -96,7 +98,7 @@ Cause:
 - Config file missing or empty at the selected `--config` path.
 
 Fix:
-- Create config file with at least one profile.
+- Create config file with at least one profile, for example by running `oli config add`.
 
 ### `TOML parse error ... missing field profiles`
 
