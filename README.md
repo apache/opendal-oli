@@ -34,6 +34,21 @@ cargo install oli
 - `~/Library/Application Support/oli/config.toml` on macOS
 - `C:\Users\<UserName>\AppData\Roaming\oli\config.toml` on Windows
 
+You can create or update a file-backed profile interactively:
+
+```shell
+oli config add
+```
+
+The command asks you to select a storage schema, enter a profile name, and fill
+in the configuration fields for that schema. Secret-like fields, such as access
+tokens, passwords, and secret keys, are masked while you type. To write to a
+non-default config file, pass `--config` to the subcommand:
+
+```shell
+oli config add --config ./config.toml
+```
+
 The content of `config.toml` should follow these pattern:
 
 ```toml

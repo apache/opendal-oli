@@ -25,6 +25,13 @@ For profile source modes, config examples, and `--config` usage rules, read:
 
 - `references/profile-setup.md`
 
+Create or update a file-backed profile interactively with:
+
+```bash
+oli config add
+oli config add --config ./config.toml
+```
+
 ## Commands
 
 ### Read-Only
@@ -34,7 +41,13 @@ For profile source modes, config examples, and `--config` usage rules, read:
 - `oli ls -T <target>`
 - `oli cat <target>`
 - `oli stat <target>`
+
+### Configuration
+
+- `oli config add`
+- `oli config add --config <config.toml>`
 - `oli config view`
+- `oli config view --config <config.toml>`
 
 ### Mutating
 
