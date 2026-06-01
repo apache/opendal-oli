@@ -58,10 +58,6 @@ jobs:
 
       - name: Setup Rust builder
         uses: ./.github/actions/setup
-        with:
-          need-rocksdb: false
-          need-protoc: false
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build target
         uses: ClementTsang/cargo-action@v0.0.7
