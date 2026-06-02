@@ -69,7 +69,7 @@ uuid = { version = "1.17" }
 [dev-dependencies]
 assert_cmd = { version = "2.1" }
 comfy-table = "7"
-insta = { version = "1.43", features = ["filters"] }
+insta = { version = "1.47", features = ["filters"] }
 insta-cmd = { version = "0.6" }
 regex = "1"
 walkdir = "2.5.0"
