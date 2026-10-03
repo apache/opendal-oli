@@ -24,6 +24,12 @@ inputs:
   github-token:
     description: "Github Token"
     default: ""
+  need-cross:
+    description: "Install cross for cross compilation"
+    default: "false"
+  cross-version:
+    description: "Cross version to install (empty installs the latest release from crates.io)"
+    default: ""
 
 runs:
   using: "composite"
@@ -50,3 +56,15 @@ runs:
       with:
         version: "23.4"
         repo-token: ${{ inputs.github-token }}
+
+    - name: Setup Cross
+      if: inputs.need-cross == 'true'
+      shell: bash
+      env:
+        CROSS_VERSION: ${{ inputs.cross-version }}
+      run: |
+        if [ -n "$CROSS_VERSION" ]; then
+          cargo install cross --locked --version "$CROSS_VERSION"
+        else
+          cargo install cross --locked
+        fi
