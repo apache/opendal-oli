@@ -15,34 +15,36 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Oli CI
+name: ASF Allowlist Check
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
   pull_request:
     branches:
       - main
+    paths:
+      - ".github/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/**"
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
-  check_clippy_and_test:
+  asf-allowlist-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-
-      - name: Setup Rust toolchain
-        uses: ./.github/actions/setup
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
-      - name: Cargo clippy && test
-        env:
-          SCCACHE_GHA_ENABLED: "true"
-          RUSTC_WRAPPER: "sccache"
-        run: |
-          cargo clippy --all-targets --all-features -- -D warnings
-          cargo test --all-targets --all-features
+        with:
+          persist-credentials: false
+      - uses: apache/infrastructure-actions/allowlist-check@main
+        with:
+          scan-glob: ".github/**/*.y*ml"

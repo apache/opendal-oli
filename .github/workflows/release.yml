@@ -54,19 +54,25 @@ jobs:
             target: x86_64-pc-windows-msvc
             use-cross: false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Setup Rust builder
         uses: ./.github/actions/setup
+        with:
+          need-cross: ${{ matrix.use-cross }}
 
       - name: Build target
-        uses: ClementTsang/cargo-action@v0.0.7
-        with:
-          use-cross: ${{ !!matrix.use-cross }}
-          command: build
-          args: --locked --release --target ${{ matrix.target }}
         env:
           CARGO_PROFILE_RELEASE_LTO: true
+          TARGET: ${{ matrix.target }}
+          USE_CROSS: ${{ matrix.use-cross }}
+        run: |
+          rustup target add "$TARGET"
+          if [ "$USE_CROSS" = "true" ]; then
+            cross build --locked --release --target "$TARGET"
+          else
+            cargo build --locked --release --target "$TARGET"
+          fi
 
       - name: Package artifact (Unix)
         if: runner.os != 'Windows'
@@ -114,7 +120,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Download all artifacts
         uses: actions/download-artifact@v7
